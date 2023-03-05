@@ -245,8 +245,6 @@ class DataPrepper:
         feature_results["doc_id"] = []
         feature_results["query_id"] = []
         feature_results["sku"] = []
-        feature_results["name_match"] = []
-        rng = np.random.default_rng(12345)
 
         hits = response and response.hits and response.hits.hits
 
