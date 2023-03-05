@@ -246,7 +246,7 @@ class DataPrepper:
         feature_results["query_id"] = []
         feature_results["sku"] = []
 
-        hits = response and response.hits and response.hits.hits
+        hits = response and response["hits"] and response["hits"]["hits"]
 
         if hits:
             for hit in hits:
