@@ -234,7 +234,6 @@ class DataPrepper:
         log_query = lu.create_feature_log_query(key, query_doc_ids, click_prior_query, self.featureset_name,
                                                 self.ltr_store_name,
                                                 size=len(query_doc_ids), terms_field=terms_field)
-        print(log_query)
         ##### Step Extract LTR Logged Features:
         # IMPLEMENT_START --
         # print("IMPLEMENT ME: __log_ltr_query_features: Extract log features out of the LTR:EXT response and place in a data frame")
@@ -257,16 +256,13 @@ class DataPrepper:
                 feature_results["query_id"].append(query_id)
                 feature_results["sku"].append(hit["_source"]["sku"][0])
 
-                log_entry_arr =  hit["fields"]["_ltrlog"]
+                features =  hit["fields"]["_ltrlog"][0]["log_entry"]
 
-                for log_entry in log_entry_arr:
-                    feature_name = log_entry["name"]
-                    feature_value = log_entry["value"]
+                for feature in features:
+                    if not feature_results[feature["name"]]:
+                        feature_results[feature["name"]] = []
 
-                    if not feature_results[feature_name]:
-                        feature_results[feature_name] = []
-
-                    feature_results[feature_name].append(feature_value)
+                    feature_results[feature["name"]].append(feature["value"])
 
         frame = pd.DataFrame(feature_results)
         return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})   
