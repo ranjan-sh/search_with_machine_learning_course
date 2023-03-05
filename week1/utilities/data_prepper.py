@@ -246,10 +246,8 @@ class DataPrepper:
         feature_results["query_id"] = []
         feature_results["sku"] = []
 
-        hits = response and response["hits"] and response["hits"]["hits"]
-
-        if hits:
-            for hit in hits:
+        if response and response["hits"] and len(response["hits"]) > 0:
+            for hit in response["hits"]["hits"]:
                 feature_results["doc_id"].append(hit["_id"])
                 feature_results["query_id"].append(query_id)
                 feature_results["sku"].append(hit["_source"]["sku"][0])
