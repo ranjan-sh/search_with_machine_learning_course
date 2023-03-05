@@ -257,7 +257,7 @@ class DataPrepper:
                 features =  hit["fields"]["_ltrlog"][0]["log_entry"]
 
                 for feature in features:
-                    if not feature_results[feature["name"]]:
+                    if feature["name"] not in feature_results:
                         feature_results[feature["name"]] = []
 
                     feature_results[feature["name"]].append(feature["value"])
