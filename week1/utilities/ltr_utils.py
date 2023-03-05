@@ -57,8 +57,41 @@ def create_sltr_hand_tuned_query(user_query, query_obj, click_prior_query, ltr_m
 
 def create_feature_log_query(query, doc_ids, click_prior_query, featureset_name, ltr_store_name, size=200, terms_field="_id"):
     ##### Step 3.b:
-    print("IMPLEMENT ME: create_feature_log_query")
-    return None
+    # print("IMPLEMENT ME: create_feature_log_query")
+    query_obj = {
+            'query': {
+                'bool': {
+                    "filter": [  # filtering all docs at once to reduce queries
+                        {
+                            "terms": {
+                                terms_field: [doc_ids]
+                            }
+                        },
+                        {
+                            "sltr": {
+                                "_name": "logged_featureset",
+                                "featureset": featureset_name,
+                                "store": ltr_store_name,
+                                "params": {
+                                    "keywords": query
+                                }
+                            }
+                        }
+                    ]
+                },
+            },
+            'size': size,
+            "ext": {
+                "ltr_log": {
+                    "log_specs": {
+                        "name": "log_entry",
+                        "named_query": "logged_featureset"
+                    }
+                }
+            }
+        }
+
+    return query_obj
 
 
 # Item is a Pandas namedtuple
