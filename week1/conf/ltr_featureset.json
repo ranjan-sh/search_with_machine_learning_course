@@ -12,6 +12,55 @@
             "name": "{{keywords}}"
           }
         }
+      },
+      {
+        "name": "name_match_phrase",
+        "params": [
+          "keywords"
+        ],
+        "template_language": "mustache",
+        "template": {
+          "match_phrase": {
+            "name": {
+              "query": "{{keywords}}",
+              "slop": 6
+            }
+          }
+        }
+      },
+      {
+        "name": "customer_review_field_value_factor",
+        "template_language": "mustache",
+        "template": {
+          "function_score": {
+            "functions": [{
+                "field_value_factor": {
+                    "field": "customer_review_average",
+                    "missing": 0
+                }
+            }],
+            "query": {
+                "match_all": {}
+            }
+          }
+        }
+      },
+      {
+        "name": "customer_review_count_field_value_factor",
+        "template_language": "mustache",
+        "template": {
+          "function_score": {
+            "functions": [{
+                "field_value_factor": {
+                    "field": "customer_review_count",
+                    "missing": 0
+                }
+            }],
+            "query": {
+                "match_all": {}
+            }
+          }
+        }
       }
     ]
   }
