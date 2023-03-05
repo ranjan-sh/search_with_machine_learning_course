@@ -260,7 +260,7 @@ class DataPrepper:
                     if feature["name"] not in feature_results:
                         feature_results[feature["name"]] = []
 
-                    feature_results[feature["name"]].append(feature["value"])
+                    feature_results[feature["name"]].append(feature.get("value", 0))
 
         frame = pd.DataFrame(feature_results)
         return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})   
