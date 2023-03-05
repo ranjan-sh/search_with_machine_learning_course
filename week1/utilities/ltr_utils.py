@@ -82,7 +82,7 @@ def create_feature_log_query(query, doc_ids, click_prior_query, featureset_name,
                     "filter": [  # filtering all docs at once to reduce queries
                         {
                             "terms": {
-                                terms_field: [doc_ids]
+                                terms_field: doc_ids
                             }
                         },
                         {
