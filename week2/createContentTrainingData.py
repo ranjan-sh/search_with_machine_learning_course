@@ -65,13 +65,13 @@ def prune_labels(all_labels):
     # add all files to dataframe
     for label_list in all_labels:
         df_temp = pd.DataFrame(label_list, columns=['cat', 'name'])
-        df.append(df_temp)
+        df = df.append(df_temp)
 
     # add column for category-wise count
     df['cat_product_count'] = df.groupby('cat')['cat'].transform('count')
 
     # create new df with categories with min nunber of products
-    df_filtered = df[df['cat_count'] >= min_products]
+    df_filtered = df[df['cat_product_count'] >= min_products]
 
     return df_filtered
 
