@@ -59,7 +59,7 @@ def _label_filename(filename):
               labels.append((cat, transform_name(name)))
     return labels
 
-def preprocess_labels(all_labels):
+def prune_labels(all_labels):
     df = pd.DataFrame(columns=['cat', 'name'])
 
     # add all files to dataframe
@@ -71,7 +71,7 @@ def preprocess_labels(all_labels):
     df['cat_product_count'] = df.groupby('cat')['cat'].transform('count')
 
     # create new df with categories with min nunber of products
-    df_filtered = df['cat_count' >= min_products]
+    df_filtered = df[df['cat_count'] >= min_products]
 
     return df_filtered
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     with multiprocessing.Pool() as p:
         all_labels = tqdm(p.imap(_label_filename, files), total=len(files))
 
-        processed_labels_df = preprocess_labels(all_labels)
+        processed_labels_df = prune_labels(all_labels)
 
         with open(output_file, 'w') as output:
             for index, row in processed_labels_df.iterrows():
