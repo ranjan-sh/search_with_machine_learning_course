@@ -5,6 +5,7 @@ from tqdm import tqdm
 import os
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import pandas as pd
 
 def transform_name(product_name):
     # IMPLEMENT
@@ -58,12 +59,30 @@ def _label_filename(filename):
               labels.append((cat, transform_name(name)))
     return labels
 
+def preprocess_labels(all_labels):
+    df = pd.DataFrame(columns=['cat', 'name'])
+
+    # add all files to dataframe
+    for label_list in all_labels:
+        df_temp = pd.DataFrame(label_list, columns=['cat', 'name'])
+        df.append(df_temp)
+
+    # add column for category-wise count
+    df['cat_product_count'] = df.groupby('cat')['cat'].transform('count')
+
+    # create new df with categories with min nunber of products
+    df_filtered = df['cat_count' >= min_products]
+
+    return df_filtered
+
 if __name__ == '__main__':
     files = glob.glob(f'{directory}/*.xml')
     print("Writing results to %s" % output_file)
     with multiprocessing.Pool() as p:
         all_labels = tqdm(p.imap(_label_filename, files), total=len(files))
+
+        processed_labels_df = preprocess_labels(all_labels)
+
         with open(output_file, 'w') as output:
-            for label_list in all_labels:
-                for (cat, name) in label_list:
-                    output.write(f'__label__{cat} {name}\n')
+            for index, row in processed_labels_df.iterrows():
+                output.write(f'__label__{row["cat"]} {row["name"]}\n')
