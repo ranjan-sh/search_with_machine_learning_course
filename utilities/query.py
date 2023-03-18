@@ -217,7 +217,7 @@ if __name__ == "__main__":
                          help='The OpenSearch port')
     general.add_argument('--user',
                          help='The OpenSearch admin.  If this is set, the program will prompt for password too. If not set, use default of admin/admin')
-    general.add_argument("-S", '--synonyms', default=False,
+    general.add_argument('--synonyms', action="store_true", default=False,
                          help='If set, use synonym field to query.')
 
     args = parser.parse_args()
@@ -247,13 +247,10 @@ if __name__ == "__main__":
     )
     index_name = args.index
     query_prompt = "\nEnter your query (type 'Exit' to exit or hit ctrl-c):"
-    print(query_prompt)
-    for line in fileinput.input():
+    # print(query_prompt)
+    while True:
+        line =input(query_prompt).rstrip()
         query = line.rstrip()
-        if query == "Exit":
-            break
+        if query.lower() == "exit":
+            exit(0)
         search(client=opensearch, user_query=query, index=index_name)
-
-        print(query_prompt)
-
-    
