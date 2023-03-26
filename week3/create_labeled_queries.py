@@ -19,10 +19,6 @@ general = parser.add_argument_group("general")
 general.add_argument("--min_queries", default=1,  help="The minimum number of queries per category label (default is 1)")
 general.add_argument("--output", default=output_file_name, help="the file to output to")
 
-def stem(query):
-    tokens = query.split()
-    stemmed_tokens = [stemmer.stem(token) for token in tokens]
-    return ' '.join(stemmed_tokens)
 
 args = parser.parse_args()
 output_file_name = args.output
@@ -54,10 +50,27 @@ queries_df = pd.read_csv(queries_file_name)[['category', 'query']]
 queries_df = queries_df[queries_df['category'].isin(categories)]
 
 # IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.'
+def stem(query):
+    tokens = query.split()
+    stemmed_tokens = [stemmer.stem(token) for token in tokens]
+    return ' '.join(stemmed_tokens)
+
 queries_df['query'] = queries_df['query'].str.lower().replace('[^a-z0-9]', ' ', regex=True).replace('\s+', ' ', regex=True)
 queries_df['query'] = queries_df['query'].apply(stem)
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
+def roll_categories(row):
+    if row['count'] < min_queries:
+        parent_cat = parents_df.loc[parents_df['category'] == row['category']]['parent']
+        row['category'] = parent_cat
+    return row
+
+queries_df['count'] = queries_df.groupby('category')['category'].transform('count')
+
+while not queries_df[queries_df['count'] < min_queries].empty:
+    queries_df = queries_df.apply(roll_categories, axis=1)
+    queries_df = queries_df[queries_df['category'].isin(categories)].reset_index(drop=True)
+    queries_df['count'] = queries_df.groupby('category')['category'].transform('count')
 
 # Create labels in fastText format.
 queries_df['label'] = '__label__' + queries_df['category']
